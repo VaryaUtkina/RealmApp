@@ -10,7 +10,6 @@ import UIKit
 import RealmSwift
 
 final class TaskListViewController: UITableViewController {
-
     private var taskLists: Results<TaskList>!
     private let storageManager = StorageManager.shared
     private let dataManager = DataManager.shared
@@ -44,10 +43,16 @@ final class TaskListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskListCell", for: indexPath)
         var content = cell.defaultContentConfiguration()
         let taskList = taskLists[indexPath.row]
+        let completedTasksCount = taskList.tasks.filter("isComplete = true").count
         let currentTasksCount = taskList.tasks.filter("isComplete = false").count
         content.text = taskList.title
-        cell.accessoryType = currentTasksCount == 0 ? .checkmark : .none
-        content.secondaryText = currentTasksCount != 0 ? currentTasksCount.formatted() : ""
+        if currentTasksCount == 0 && completedTasksCount != 0 {
+            cell.accessoryType = .checkmark
+            content.secondaryText = ""
+        } else {
+            cell.accessoryType = .none
+            content.secondaryText = currentTasksCount.formatted()
+        }
         cell.contentConfiguration = content
         return cell
     }
@@ -89,7 +94,16 @@ final class TaskListViewController: UITableViewController {
     }
 
     @IBAction func sortingList(_ sender: UISegmentedControl) {
+        let segmentIndex = sender.selectedSegmentIndex
+        
+        if segmentIndex == 0 {
+            taskLists = taskLists.sorted(byKeyPath: "date", ascending: true)
+        } else {
+            taskLists = taskLists.sorted(byKeyPath: "title", ascending: true)
+        }
+        tableView.reloadData()
     }
+
     
     @objc private func addButtonPressed() {
         showAlert()

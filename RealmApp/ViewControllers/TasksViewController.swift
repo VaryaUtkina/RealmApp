@@ -73,9 +73,9 @@ final class TasksViewController: UITableViewController {
         
         let doneAction = UIContextualAction(style: .normal, title: indexPath.section == 0 ? "Done" : "Undone") { [unowned self] _, _, isDone in
             if indexPath.section == 0 {
-                storageManager.doneTask(task, value: true)
+                storageManager.done(task, value: true)
             } else {
-                storageManager.doneTask(task, value: false)
+                storageManager.done(task, value: false)
             }
             tableView.reloadData()
             isDone(true)
@@ -116,7 +116,7 @@ extension TasksViewController {
                 style: .default
             ) { [unowned self] taskTitle, taskNote in
                     if let task, let completion {
-                        storageManager.editTask(task, newTask: taskTitle, newNote: taskNote)
+                        storageManager.edit(task, newTask: taskTitle, newNote: taskNote)
                         completion()
                     return
                 }

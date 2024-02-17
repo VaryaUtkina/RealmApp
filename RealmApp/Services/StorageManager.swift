@@ -60,7 +60,7 @@ final class StorageManager {
         }
     }
     
-    func editTask(_ task: Task, newTask: String, newNote: String) {
+    func edit(_ task: Task, newTask: String, newNote: String) {
         write {
             task.title = newTask
             task.note = newNote
@@ -73,7 +73,7 @@ final class StorageManager {
         }
     }
     
-    func doneTask(_ task: Task, value: Bool) {
+    func done(_ task: Task, value: Bool) {
         write {
             task.isComplete = value
         }
