@@ -44,8 +44,10 @@ final class TaskListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskListCell", for: indexPath)
         var content = cell.defaultContentConfiguration()
         let taskList = taskLists[indexPath.row]
+        let currentTasksCount = taskList.tasks.filter("isComplete = false").count
         content.text = taskList.title
-        content.secondaryText = taskList.tasks.count.formatted()
+        cell.accessoryType = currentTasksCount == 0 ? .checkmark : .none
+        content.secondaryText = currentTasksCount != 0 ? currentTasksCount.formatted() : ""
         cell.contentConfiguration = content
         return cell
     }

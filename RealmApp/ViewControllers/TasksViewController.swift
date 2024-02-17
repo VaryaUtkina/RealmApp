@@ -55,8 +55,48 @@ final class TasksViewController: UITableViewController {
         return cell
     }
     
+    // MARK: - UITableViewDelegate
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let task = indexPath.section == 0 ? currentTasks[indexPath.row] : completedTasks[indexPath.row]
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [unowned self] _, _, _ in
+            storageManager.deleteTask(task)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
+        
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { [unowned self] _, _, isDone in
+            showAlert(with: task) {
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            isDone(true)
+        }
+        
+        let doneAction = UIContextualAction(style: .normal, title: indexPath.section == 0 ? "Done" : "Undone") { [unowned self] _, _, isDone in
+            if indexPath.section == 0 {
+                storageManager.doneTask(task, value: true)
+            } else {
+                storageManager.doneTask(task, value: false)
+            }
+            tableView.reloadData()
+            isDone(true)
+        }
+        
+        editAction.backgroundColor = .orange
+        doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+        
+        return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+    }
+    
     @objc private func addButtonPressed() {
         showAlert()
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let task = indexPath.section == 0 ? currentTasks[indexPath.row] : completedTasks[indexPath.row]
+        showAlert(with: task) {
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
     }
 
 }
@@ -75,8 +115,9 @@ extension TasksViewController {
                 title: task != nil ? "Update Task" : "Save Task",
                 style: .default
             ) { [unowned self] taskTitle, taskNote in
-                if let task, let completion {
-                    // TODO: - edit task
+                    if let task, let completion {
+                        storageManager.editTask(task, newTask: taskTitle, newNote: taskNote)
+                        completion()
                     return
                 }
                 createTask(withTitle: taskTitle, andNote: taskNote)
