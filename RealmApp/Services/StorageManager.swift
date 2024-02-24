@@ -48,34 +48,16 @@ final class StorageManager {
         }
     }
     
-    func deleteTask(_ task: Task) {
-        write {
-            realm.delete(task)
-        }
-    }
     
     func edit(_ taskList: TaskList, newValue: String) {
         write {
             taskList.title = newValue
         }
     }
-    
-    func edit(_ task: Task, newTask: String, newNote: String) {
-        write {
-            task.title = newTask
-            task.note = newNote
-        }
-    }
 
     func done(_ taskList: TaskList) {
         write {
             taskList.tasks.setValue(true, forKey: "isComplete")
-        }
-    }
-    
-    func done(_ task: Task, value: Bool) {
-        write {
-            task.isComplete = value
         }
     }
 
@@ -85,6 +67,25 @@ final class StorageManager {
             let task = Task(value: [task, note])
             taskList.tasks.append(task)
             completion(task)
+        }
+    }
+    
+    func deleteTask(_ task: Task) {
+        write {
+            realm.delete(task)
+        }
+    }
+    
+    func edit(_ task: Task, newTask: String, newNote: String) {
+        write {
+            task.title = newTask
+            task.note = newNote
+        }
+    }
+    
+    func done(_ task: Task) {
+        write {
+            task.isComplete.toggle()
         }
     }
     

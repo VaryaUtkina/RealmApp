@@ -41,19 +41,8 @@ final class TaskListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskListCell", for: indexPath)
-        var content = cell.defaultContentConfiguration()
         let taskList = taskLists[indexPath.row]
-        let completedTasksCount = taskList.tasks.filter("isComplete = true").count
-        let currentTasksCount = taskList.tasks.filter("isComplete = false").count
-        content.text = taskList.title
-        if currentTasksCount == 0 && completedTasksCount != 0 {
-            cell.accessoryType = .checkmark
-            content.secondaryText = ""
-        } else {
-            cell.accessoryType = .none
-            content.secondaryText = currentTasksCount.formatted()
-        }
-        cell.contentConfiguration = content
+        cell.configure(with: taskList)
         return cell
     }
     
@@ -94,13 +83,10 @@ final class TaskListViewController: UITableViewController {
     }
 
     @IBAction func sortingList(_ sender: UISegmentedControl) {
-        let segmentIndex = sender.selectedSegmentIndex
-        
-        if segmentIndex == 0 {
-            taskLists = taskLists.sorted(byKeyPath: "date", ascending: true)
-        } else {
-            taskLists = taskLists.sorted(byKeyPath: "title", ascending: true)
-        }
+        taskLists = sender.selectedSegmentIndex == 0
+        ? taskLists.sorted(byKeyPath: "date")
+        : taskLists.sorted(byKeyPath: "title")
+
         tableView.reloadData()
     }
 
